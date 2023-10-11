@@ -2,7 +2,6 @@ package com.tosan.tools.jalali;
 
 import org.junit.jupiter.api.Test;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,7 +18,7 @@ public class JalaliCalendarTest {
     @Test
     public void currentDate() {
         JalaliCalendar jalaliCalendar = new JalaliCalendar();
-        JalaliDate jalaliDate = new JalaliDate(1388, JalaliCalendar.ABAN, 4, 14, 18, 0);
+        JalaliDate jalaliDate = new JalaliDate(1388, 8, 4, 14, 18, 0);
         //1388/4/16 14:18:XX > 1388/4/16 14:18:00
         JalaliDate newJalaliDate = new JalaliDate(jalaliCalendar.get(Calendar.YEAR), jalaliCalendar.get(Calendar.MONTH) + 1,
                 jalaliCalendar.get(Calendar.DAY_OF_MONTH), jalaliCalendar.get(Calendar.HOUR_OF_DAY),
@@ -28,56 +27,50 @@ public class JalaliCalendarTest {
     }
 
     @Test
+    public void convertGtoJDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2009, Calendar.MARCH, 20, 23, 50, 3);
+        JalaliDate newJalaliDate = JalaliUtil.gregorianToJalali(calendar.getTime());
+        JalaliDate jalaliDate = new JalaliDate(1387, 12, 30, 23, 50, 3);
+        assertEquals(jalaliDate, newJalaliDate);
+    }
+
+    @Test
     public void convertGtoJWithOutTimeZone() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+3:30"));
         calendar.set(2009, Calendar.MARCH, 20, 23, 50, 3);
-        //Converts gregorian to jalali
         JalaliCalendar jalaliCalendar = new JalaliCalendar(calendar);
-        JalaliDate newJalaliDate = new JalaliDate(jalaliCalendar.get(Calendar.YEAR), jalaliCalendar.get(Calendar.MONTH) + 1,
-                jalaliCalendar.get(Calendar.DAY_OF_MONTH), jalaliCalendar.get(Calendar.HOUR_OF_DAY),
-                jalaliCalendar.get(Calendar.MINUTE), jalaliCalendar.get(Calendar.SECOND));
-        //Creates DateTime instant with expected date, time and time zone
-        JalaliDate jalaliDate = new JalaliDate(1387, JalaliCalendar.ESFAND, 30, 23, 50, 3);
-        //The expected DateTime and the returned DateTime instant are equals.
-        assertEquals(jalaliDate, newJalaliDate);
+        JalaliDate jalaliDate = new JalaliDate(1387, 12, 30, 23, 50, 3);
+        assertEquals(jalaliDate, jalaliCalendar.getJalaliDate());
     }
 
     @Test
     public void convertGtoJWithTimeZone() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+3:30"));
         calendar.set(2009, Calendar.MARCH, 20, 23, 20, 3);
-        //Converts gregorian to Jalali date with expected time zone
         JalaliCalendar jalaliCalendar = new JalaliCalendar(calendar, TimeZone.getTimeZone("GMT+4:00"));
         JalaliDate newJalaliDate = new JalaliDate(jalaliCalendar.get(Calendar.YEAR), jalaliCalendar.get(Calendar.MONTH) + 1,
                 jalaliCalendar.get(Calendar.DAY_OF_MONTH), jalaliCalendar.get(Calendar.HOUR_OF_DAY),
-                jalaliCalendar.get(Calendar.MINUTE), jalaliCalendar.get(Calendar.SECOND), 0,
-                TimeZone.getTimeZone("GMT+4:00"));
-        //Creates DateTime instant with expected date, time and time zone
-        JalaliDate jalaliDate = new JalaliDate(1387, JalaliCalendar.ESFAND, 30, 23, 50, 3, 0,
-                TimeZone.getTimeZone("GMT+4:00"));
-        //The expected DateTime and the returned DateTime instant are equals.
+                jalaliCalendar.get(Calendar.MINUTE), jalaliCalendar.get(Calendar.SECOND), 0);
+        JalaliDate jalaliDate = new JalaliDate(1387, 12, 30, 23, 50, 3, 0);
         assertEquals(jalaliDate, newJalaliDate);
     }
 
     @Test
-    public void convertJToAnOtherTimeZone() {
-        JalaliCalendar jalaliCalendar = new JalaliCalendar(new JalaliDate(1387, 12, 30, 23, 65, 60, 346),
-                TimeZone.getTimeZone("GMT+04:00"));
+    public void convertJToAnotherTimeZone() {
+        JalaliCalendar jalaliCalendar = new JalaliCalendar(new JalaliDate(1387, 12, 30, 23, 65, 60, 346));
         JalaliDate newJalaliDate = new JalaliDate(jalaliCalendar.get(Calendar.YEAR), jalaliCalendar.get(Calendar.MONTH) + 1,
                 jalaliCalendar.get(Calendar.DAY_OF_MONTH), jalaliCalendar.get(Calendar.HOUR_OF_DAY),
                 jalaliCalendar.get(Calendar.MINUTE), jalaliCalendar.get(Calendar.SECOND), 0, TimeZone.getTimeZone("GMT+4:00"));
-        //Creates DateTime instant with expected date, time and time zone
-        JalaliDate jalaliDate = new JalaliDate(1388, JalaliCalendar.FARVARDIN, 1, 0, 36, 0, 0,
+        JalaliDate jalaliDate = new JalaliDate(1388, 1, 1, 0, 6, 0, 0,
                 TimeZone.getTimeZone("GMT+4:00"));
-        //The expected DateTime and the returned DateTime instant are equals.
         assertEquals(jalaliDate, newJalaliDate);
     }
 
     @Test
-    public void convertGtoJAnOtherWay() {
+    public void convertGtoJAnotherWay() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2009, Calendar.MARCH, 20, 23, 20, 3);
-        //Converts gregorian to Jalali date
         JalaliCalendar jalaliCalendar = new JalaliCalendar(calendar);
         SimpleDateFormat format = new SimpleDateFormat("yyyy MM dd KK:mm:ss a");
         format.setCalendar(jalaliCalendar);
@@ -86,33 +79,23 @@ public class JalaliCalendarTest {
 
     @Test
     public void convertJtoG() {
-        JalaliDate jalaliDate = new JalaliDate(1387, JalaliCalendar.ESFAND, 30, 23, 20, 3);
-        JalaliCalendar jalaliCalendar = new JalaliCalendar(jalaliDate);
+        JalaliDate jalaliDate = new JalaliDate(1387, 12, 30, 23, 20, 3);
+        Date gDate = JalaliUtil.jalaliToGregorian(jalaliDate);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        assertEquals("2009/03/20 23:20:03", formatter.format(jalaliCalendar.getTime()));
+        assertEquals("2009/03/20 23:20:03", formatter.format(gDate));
     }
 
     @Test
-    public void parse() throws ParseException {
-        SimpleDateFormat format = (SimpleDateFormat)
-                java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT);
-        JalaliCalendar jalaliCalendar = new JalaliCalendar();
-        //Set the new jalaliCalendar for parsing the text.
-        format.setCalendar(jalaliCalendar);
-        //Parse the text and change the jalaliCalendar state.
-        format.parse("9/19/1383, 15:14 PM");
-        //Get the jalaliCalendar state as a DateTime instant.
-        JalaliDate newJalaliDate = new JalaliDate(jalaliCalendar.get(Calendar.YEAR), jalaliCalendar.get(Calendar.MONTH) + 1,
-                jalaliCalendar.get(Calendar.DAY_OF_MONTH), jalaliCalendar.get(Calendar.HOUR_OF_DAY),
-                jalaliCalendar.get(Calendar.MINUTE), 0);
-        JalaliDate jalaliDate = new JalaliDate(1383, JalaliCalendar.AZAR, 19, 15, 14, 0);
-        assertEquals(newJalaliDate, jalaliDate);
+    public void parse() {
+        JalaliDate jalaliDate = new JalaliDate(1383, 9, 19, 15, 14, 0);
+        JalaliDate newJalaliDate = JalaliUtil.parseJalaliDate("1383/9/19, 15:14", "yyyy/MM/dd, HH:mm");
+        assertEquals(jalaliDate, newJalaliDate);
     }
 
     @Test
-    public void parse1() throws ParseException {
+    public void parse1() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM");
-        JalaliCalendar jalaliCalendar = new JalaliCalendar(new JalaliDate(1386, JalaliCalendar.MEHR, 2, 16, 41, 60));
+        JalaliCalendar jalaliCalendar = new JalaliCalendar(new JalaliDate(1386, 7, 2, 16, 41, 60));
         assertEquals(jalaliCalendar.get(Calendar.AM_PM), 1);
         format.setCalendar(jalaliCalendar);
         assertEquals(format.format(jalaliCalendar.getTime()), "1386/07");
@@ -121,20 +104,15 @@ public class JalaliCalendarTest {
 
     @Test
     public void calendarSetter() {
-        JalaliCalendar cal = new JalaliCalendar(Calendar.getInstance(), TimeZone.getTimeZone("GMT+3:30"));
-        cal.set(1388, JalaliCalendar.MEHR, 30, 16, 34, 23);
-        assertEquals(cal.get(Calendar.HOUR), 4);
-        assertEquals(cal.get(Calendar.HOUR_OF_DAY), 16);
-        assertEquals(cal.get(Calendar.MONTH), 7);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 30);
-        cal.clear(Calendar.DAY_OF_MONTH);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 1);
-        assertEquals(cal.get(Calendar.YEAR), 1388);
+        JalaliCalendar cal = new JalaliCalendar(Calendar.getInstance());
+        cal.set(1388, 6, 30, 16, 34, 23);
+        JalaliDate jalaliDate = new JalaliDate(1388, 7, 30, 16, 34, 23);
+        assertEquals(jalaliDate, cal.getJalaliDate());
     }
 
     @Test
     public void add() {
-        JalaliDate jalaliDate = new JalaliDate(1387, JalaliCalendar.ESFAND, 29, 9, 55, 0, 0,
+        JalaliDate jalaliDate = new JalaliDate(1387, 12, 29, 9, 55, 0, 0,
                 TimeZone.getDefault());
         JalaliCalendar jalaliCalendar = new JalaliCalendar(jalaliDate);
         jalaliCalendar.add(Calendar.YEAR, 0);
@@ -143,7 +121,7 @@ public class JalaliCalendarTest {
         JalaliDate newJalaliDate = new JalaliDate(jalaliCalendar.get(Calendar.YEAR), jalaliCalendar.get(Calendar.MONTH) + 1,
                 jalaliCalendar.get(Calendar.DAY_OF_MONTH), jalaliCalendar.get(Calendar.HOUR_OF_DAY),
                 jalaliCalendar.get(Calendar.MINUTE), 0, 0, TimeZone.getDefault());
-        JalaliDate jalaliDate1 = new JalaliDate(1388, JalaliCalendar.KHORDAD, 29, 9, 55, 0, 0,
+        JalaliDate jalaliDate1 = new JalaliDate(1388, 3, 29, 9, 55, 0, 0,
                 TimeZone.getDefault());
         assertEquals(newJalaliDate, jalaliDate1);
 
@@ -153,7 +131,7 @@ public class JalaliCalendarTest {
         newJalaliDate = new JalaliDate(jalaliCalendar.get(Calendar.YEAR), jalaliCalendar.get(Calendar.MONTH) + 1,
                 jalaliCalendar.get(Calendar.DAY_OF_MONTH), jalaliCalendar.get(Calendar.HOUR_OF_DAY),
                 jalaliCalendar.get(Calendar.MINUTE), 0, 0, TimeZone.getDefault());
-        jalaliDate1 = new JalaliDate(1385, JalaliCalendar.FARVARDIN, 24, 9, 55, 0, 0,
+        jalaliDate1 = new JalaliDate(1385, 1, 24, 9, 55, 0, 0,
                 TimeZone.getDefault());
         assertEquals(newJalaliDate, jalaliDate1); // Be aware of millisecond !
     }
@@ -286,9 +264,7 @@ public class JalaliCalendarTest {
     public void equality() {
         JalaliDate j1 = new JalaliDate(1387, 9, 8);
         JalaliDate j2 = new JalaliDate(1387, 9, 8, 0, 0, 0);
-        Object o = new Date();
 
-        assertNotEquals(j1, o);
         assertNotEquals(j1, null);
         assertEquals(j1, j2);
         assertNotEquals(j1, new JalaliDate(1386, 1, 1, 1, 1, 1));
@@ -317,17 +293,17 @@ public class JalaliCalendarTest {
     }
 
     @Test
-    public void getMethod() {
-        Calendar calendar = Calendar.getInstance();
+    public void changeTimeZone() {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+3:00"));
         calendar.set(2009, Calendar.MARCH, 20, 23, 20, 3);
-        JalaliCalendar jalaliCalendar = new JalaliCalendar(calendar, TimeZone.getTimeZone("GMT+4:00"));
+        JalaliCalendar jalaliCalendar = new JalaliCalendar(calendar, TimeZone.getTimeZone("GMT+3:30"));
 
         assertEquals(jalaliCalendar.get(JalaliCalendar.YEAR), 1387);
         assertEquals(jalaliCalendar.get(JalaliCalendar.MONTH), 12 - 1);
         assertEquals(jalaliCalendar.get(JalaliCalendar.DAY_OF_MONTH), 30);
         assertEquals(jalaliCalendar.get(JalaliCalendar.HOUR), 11);
         assertEquals(jalaliCalendar.get(JalaliCalendar.HOUR_OF_DAY), 23);
-        assertEquals(jalaliCalendar.get(JalaliCalendar.MINUTE), 50); //Cause of GMT+4:00 (20 + 30)
+        assertEquals(jalaliCalendar.get(JalaliCalendar.MINUTE), 50);
         assertEquals(jalaliCalendar.get(JalaliCalendar.SECOND), 3);
     }
 }

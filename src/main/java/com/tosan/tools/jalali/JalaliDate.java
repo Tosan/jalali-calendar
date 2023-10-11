@@ -51,12 +51,6 @@ public class JalaliDate implements Serializable, Comparable<JalaliDate> {
             this.timeZone = timeZone;
     }
 
-    /**
-     * Checks for equality with another object.
-     *
-     * @param o other object
-     * @return true if both objects are equal, false otherwise
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -84,9 +78,6 @@ public class JalaliDate implements Serializable, Comparable<JalaliDate> {
         return true;
     }
 
-    /**
-     * @return hash code for this instance
-     */
     @Override
     public int hashCode() {
         int result = year;
@@ -226,19 +217,19 @@ public class JalaliDate implements Serializable, Comparable<JalaliDate> {
         this.second = second;
     }
 
-    public TimeZone getTimeZone() {
-        return timeZone;
-    }
-
-    public void setTimeZone(TimeZone timeZone) {
-        this.timeZone = timeZone;
-    }
-
     public int getMillisecond() {
         return millisecond;
     }
 
     public void setMillisecond(int millisecond) {
         this.millisecond = millisecond;
+    }
+
+    public TimeZone getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(TimeZone timeZone) {
+        this.timeZone = timeZone;
     }
 }

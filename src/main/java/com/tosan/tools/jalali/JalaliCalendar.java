@@ -14,52 +14,34 @@ import java.util.TimeZone;
  */
 public class JalaliCalendar extends Calendar {
     private static final long serialVersionUID = 638910237070675779L;
-    public static final int FARVARDIN = 1;
-    public static final int ORDIBEHESHT = 2;
-    public static final int KHORDAD = 3;
-    public static final int TIR = 4;
-    public static final int MORDAD = 5;
-    public static final int SHAHRIVAR = 6;
-    public static final int MEHR = 7;
-    public static final int ABAN = 8;
-    public static final int AZAR = 9;
-    public static final int DEY = 10;
-    public static final int BAHMAN = 11;
-    public static final int ESFAND = 12;
+    private static final byte[] GREGORIAN_DAYS_IN_MONTH = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    private static final byte[] JALALI_DAYS_IN_MONTH = {31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29};
 
     private final TimeZone desTimeZone;
     private final TimeZone eraTimeZone;
     private boolean calcOverflow;
     private boolean computeDesTimeZone;
     private boolean isCalledConstructor = false;
-
-    /*increment, decrement and getDateTime() methods use this flag for recognizing the input parameter
-    when a constructor is called. Parameter will be DateTime or Date.*/
-    private boolean isDateTime;
-
-    private static final TimeZone GMT_TIME_ZONE = TimeZone.getDefault();
-
-    private static final byte[] GREGORIAN_DAYS_IN_MONTH = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    private static final byte[] JALALI_DAYS_IN_MONTH = {31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29};
+    private boolean isJalaliDate;
 
     public JalaliCalendar() {
-        this(Calendar.getInstance(GMT_TIME_ZONE));
+        this(Calendar.getInstance());
     }
 
     /**
-     * Get {@link JalaliDate} with the special TimeZone and convert by getCalendar() methods to a Gregorian date and default TimeZone.
+     * Get {@link JalaliDate} with its timezone.
      *
      * @param jalaliDate jalaliDate
      */
     public JalaliCalendar(JalaliDate jalaliDate) {
-        this(jalaliDate, jalaliDate.getTimeZone(), TimeZone.getDefault());
+        this(jalaliDate, jalaliDate.getTimeZone());
     }
 
     /**
-     * Get {@link JalaliDate} with the special TimeZone and convert by getCalendar() methods to a Gregorian date and destination TimeZone.
+     * Get {@link JalaliDate} with its timezone and convert to destination timezone.
      *
      * @param jalaliDate  jalaliDate
-     * @param desTimeZone Destination TimeZone
+     * @param desTimeZone desTimeZone
      */
     public JalaliCalendar(JalaliDate jalaliDate, TimeZone desTimeZone) {
         this(jalaliDate, jalaliDate.getTimeZone(), desTimeZone);
@@ -67,11 +49,11 @@ public class JalaliCalendar extends Calendar {
 
     /**
      * @param jalaliDate  jalaliDate
-     * @param eraTimeZone Era TimeZone
-     * @param desTimeZone Destination TimeZone
+     * @param eraTimeZone era timezone
+     * @param desTimeZone destination timezone
      */
     private JalaliCalendar(JalaliDate jalaliDate, TimeZone eraTimeZone, TimeZone desTimeZone) {
-        isDateTime = true;
+        isJalaliDate = true;
         fields[1] = jalaliDate.getYear();
         fields[2] = jalaliDate.getMonth();
         fields[5] = jalaliDate.getDay();
@@ -130,7 +112,7 @@ public class JalaliCalendar extends Calendar {
     }
 
     /**
-     * Get {@link Date} with the default TimeZone and convert by getDateTime() method to a Jalali date and default TimeZone.
+     * Get {@link Date} with the default timezone and convert to jalali date and default timezone.
      *
      * @param date date
      */
@@ -139,24 +121,24 @@ public class JalaliCalendar extends Calendar {
     }
 
     /**
-     * Get {@link Date} with the default TimeZone and convert by getDateTime() method to a Jalali date and destination TimeZone.
+     * Get {@link Date} with the default timezone and convert to jalali date and destination timezone.
      *
      * @param date        date
-     * @param desTimeZone Destination TimeZone
+     * @param desTimeZone destination timezone
      */
     public JalaliCalendar(Date date, TimeZone desTimeZone) {
         this(date, TimeZone.getDefault(), desTimeZone);
     }
 
     /**
-     * Get {@link Date} with the era TimeZone and convert by getDateTime() method to a Jalali date and destination TimeZone.
+     * Get {@link Date} with the era timezone and convert to jalali date and destination timezone.
      *
      * @param date        date
-     * @param eraTimeZone Era TimeZone
-     * @param desTimeZone Destination TimeZone
+     * @param eraTimeZone era timezone
+     * @param desTimeZone destination timezone
      */
     public JalaliCalendar(Date date, TimeZone eraTimeZone, TimeZone desTimeZone) {
-        isDateTime = false;
+        isJalaliDate = false;
         isCalledConstructor = true;
         if (eraTimeZone == null)
             this.eraTimeZone = TimeZone.getDefault();
@@ -170,35 +152,36 @@ public class JalaliCalendar extends Calendar {
     }
 
     /**
-     * Get {@link Calendar} with the special TimeZone and convert by getDateTime() method to a Jalali date and default TimeZone.
+     * Get {@link Calendar} with its timezone and convert to jalali date and the calendar timezone.
      *
      * @param calendar calendar
      */
     public JalaliCalendar(Calendar calendar) {
-        this(calendar.getTime());
+        this(calendar.getTime(), calendar.getTimeZone());
     }
 
     /**
-     * Get {@link Calendar} with the special TimeZone and convert by getDateTime() method to a Jalali date and destination TimeZone.
+     * Get {@link Calendar} with its timezone and convert to jalali date and destination timezone.
      *
      * @param calendar    calendar
-     * @param desTimeZone Destination TimeZone
+     * @param desTimeZone destination timezone
      */
     public JalaliCalendar(Calendar calendar, TimeZone desTimeZone) {
         this(calendar.getTime(), desTimeZone);
     }
 
-    public static JalaliCalendar getInstance() {
-        return new JalaliCalendar();
+    /**
+     * Returns the jalali calendar as a {@link JalaliDate} object.
+     */
+    public JalaliDate getJalaliDate() {
+        convertToJalaliDate();
+        return new JalaliDate(get(Calendar.YEAR), get(Calendar.MONTH) + 1, get(Calendar.DAY_OF_MONTH),
+                get(Calendar.HOUR_OF_DAY), get(Calendar.MINUTE), get(Calendar.SECOND));
     }
 
-    /**
-     * Returns the jalali date and time as a {@link JalaliDate} object.
-     */
-    private void getDateTime() {
-        if (!isDateTime) {
+    private void convertToJalaliDate() {
+        if (!isJalaliDate) {
             Calendar calendar = Calendar.getInstance();
-            //calendar.clear();
             calendar.set(fields[1], fields[2], fields[5], fields[11], fields[12], fields[13]);
             Calendar resultCalendar;
             if (computeDesTimeZone) {
@@ -208,7 +191,7 @@ public class JalaliCalendar extends Calendar {
             }
             resultCalendar.setTime(calendar.getTime());
             convert(resultCalendar);
-            isDateTime = true;
+            isJalaliDate = true;
             this.setTimeZone(desTimeZone);
         }
     }
@@ -233,7 +216,6 @@ public class JalaliCalendar extends Calendar {
         }
         int[] result = jalaliToGregorian(fields[1], fields[2], fields[5]);
         calendar.set(result[0], result[1] - 1, result[2], fields[11], fields[12], fields[13]);
-        //calendar.clear();
         calendar.setTimeZone(this.eraTimeZone);
         SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd KK:mm:ss a zzz yyyy");
         format.setTimeZone(this.desTimeZone);
@@ -270,8 +252,8 @@ public class JalaliCalendar extends Calendar {
     }
 
     private void convert(Calendar calendar) {
-        int[] jalali = gregorianToJalali(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar
-                .get(Calendar.DAY_OF_MONTH));
+        int[] jalali = gregorianToJalali(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH));
         fields[1] = jalali[0];
         fields[2] = jalali[1];
         fields[5] = jalali[2];
@@ -400,18 +382,10 @@ public class JalaliCalendar extends Calendar {
         }
     }
 
-    /**
-     * Increases Jalali Date.
-     *
-     * @param iYear        year
-     * @param iMonth       month
-     * @param iDay         day
-     * @param calcOverflow calcOverflow
-     */
     private void increment(int iYear, int iMonth, int iDay, boolean calcOverflow) {
-        if (!isDateTime) {
-            getDateTime();
-            this.isDateTime = true;
+        if (!isJalaliDate) {
+            convertToJalaliDate();
+            this.isJalaliDate = true;
         }
 
         fields[1] += iYear;
@@ -435,17 +409,10 @@ public class JalaliCalendar extends Calendar {
         }
     }
 
-    /**
-     * Decrease Jalali Date.
-     *
-     * @param dYear  year
-     * @param dMonth month
-     * @param dDay   day
-     */
     private void decrement(int dYear, int dMonth, int dDay) {
-        if (!isDateTime) {
-            getDateTime();
-            this.isDateTime = true;
+        if (!isJalaliDate) {
+            convertToJalaliDate();
+            this.isJalaliDate = true;
         }
 
         boolean bMnthLastDay = false;
@@ -484,31 +451,31 @@ public class JalaliCalendar extends Calendar {
 
     public int get(int field) {
         this.setTimeZone(this.desTimeZone);
-        if (!isDateTime) {
-            getDateTime();
+        if (!isJalaliDate) {
+            convertToJalaliDate();
         }
         complete();
         switch (field) {
             case YEAR:
-                return fields[1]; //YEAR
+                return fields[1];
             case MONTH:
-                return fields[2] - 1; //MONTH
+                return fields[2] - 1;
             case DAY_OF_MONTH:
-                return fields[5]; //DAY_OF_MONTH Or DATE
+                return fields[5];
             case DAY_OF_YEAR:
-                return fields[6]; //DAY_OF_YEAR
+                return fields[6];
             case DAY_OF_WEEK:
-                return fields[7]; //DAY_OF_WEEK
+                return fields[7];
             case HOUR:
-                return (fields[11] == 0 ? 0 : fields[11] == 12 ? 0 : fields[11] > 12 ? fields[11] % 12 : fields[11]); //HOUR
+                return (fields[11] == 0 ? 0 : fields[11] == 12 ? 0 : fields[11] > 12 ? fields[11] % 12 : fields[11]);
             case HOUR_OF_DAY:
-                return (fields[11] == 0 ? 0 : fields[11] == 24 ? 0 : fields[11] > 24 ? (fields[11] % 24) : fields[11]);//HOUR_OF_DAY
+                return (fields[11] == 0 ? 0 : fields[11] == 24 ? 0 : fields[11] > 24 ? (fields[11] % 24) : fields[11]);
             case MINUTE:
-                return fields[12]; //MINUTE
+                return fields[12];
             case SECOND:
-                return fields[13]; //SECOND
+                return fields[13];
             case MILLISECOND:
-                return fields[14]; //MILLISECOND
+                return fields[14];
             case AM_PM:
                 if (fields[11] >= 0 && fields[11] < 12) {
                     if (fields[9] == 0) {
@@ -520,9 +487,9 @@ public class JalaliCalendar extends Calendar {
                     return 1;
                 }
             case ZONE_OFFSET:
-                return fields[15]; //ZONE_OFFSET
+                return fields[15];
             case DST_OFFSET:
-                return fields[16]; //DST_OFFSET
+                return fields[16];
             default:
                 return 0;
         }
@@ -564,7 +531,7 @@ public class JalaliCalendar extends Calendar {
     }
 
     /**
-     * Just work fine for YEAR, MONTH, DAY_OF_MONTH, HOUR, HOUR_OF_DAY, MINUTE, SECOND <br><br>
+     * Just work fine for YEAR, MONTH, DAY_OF_MONTH, HOUR, HOUR_OF_DAY, MINUTE, SECOND
      * <p>
      * Adds or subtracts the specified amount of time to the given calendar field, based on the calendar's rules.
      * For example, to subtract 5 days from the current time of the calendar, you can achieve it by calling:
@@ -644,8 +611,8 @@ public class JalaliCalendar extends Calendar {
             fields[15] = calendar.get(Calendar.ZONE_OFFSET);
             fields[16] = calendar.get(Calendar.DST_OFFSET);
         }
-        isDateTime = false;
-        getDateTime();
+        isJalaliDate = false;
+        convertToJalaliDate();
     }
 
     @Override
@@ -665,28 +632,28 @@ public class JalaliCalendar extends Calendar {
 
     @Override
     public int getMaximum(int field) {
-        if (!isDateTime) {
-            getDateTime();
+        if (!isJalaliDate) {
+            convertToJalaliDate();
         }
         if (field == YEAR) {
-            return 1468;
+            return 9979;
         }
-        return Calendar.getInstance().getMaximum(field); //MILLISECOND
+        return Calendar.getInstance().getMaximum(field);
     }
 
     @Override
     public int getMinimum(int field) {
-        if (!isDateTime) {
-            getDateTime();
+        if (!isJalaliDate) {
+            convertToJalaliDate();
         }
         if (field == YEAR) {
-            return 1304; //YEAR
+            return 979;
         }
-        return Calendar.getInstance().getMinimum(field); //MILLISECOND
+        return Calendar.getInstance().getMinimum(field);
     }
 
     /**
-     * Just work fine for YEAR, MONTH, DAY_OF_MONTH, HOUR, HOUR_OF_DAY, MINUTE, SECOND <br><br>
+     * Just work fine for YEAR, MONTH, DAY_OF_MONTH, HOUR, HOUR_OF_DAY, MINUTE, SECOND
      * <p>
      * Adds or subtracts (up/down) a single unit of time on the given time
      * field without changing larger fields. For example, to roll the current
@@ -709,9 +676,9 @@ public class JalaliCalendar extends Calendar {
      */
     @Override
     public void roll(int field, boolean up) {
-        if (!isDateTime) {
-            getDateTime();
-            this.isDateTime = true;
+        if (!isJalaliDate) {
+            convertToJalaliDate();
+            this.isJalaliDate = true;
         }
         switch (field) {
             case YEAR:

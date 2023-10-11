@@ -31,11 +31,9 @@ public class JalaliUtil {
         return false;
     }
 
-    public static Date jalaliToGregorian(JalaliDate jDate) {
-        JalaliDate jalaliDate = new JalaliDate(jDate.getYear(), jDate.getMonth(), jDate.getDay(), jDate.getHour(),
-                jDate.getMinute(), jDate.getSecond());
-        JalaliCalendar jalaliCalendar = new JalaliCalendar(jalaliDate);
+    public static Date jalaliToGregorian(JalaliDate jalaliDate) {
         if (jalaliDate.isValid()) {
+            JalaliCalendar jalaliCalendar = new JalaliCalendar(jalaliDate);
             return jalaliCalendar.getTime();
         } else {
             return null;
