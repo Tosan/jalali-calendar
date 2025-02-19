@@ -2,18 +2,31 @@ package com.tosan.tools.jalali;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author mosidev
  * @since 9/30/2023
  */
 public class JalaliUtil {
-    private static final int[] KHAYYAM_TABLE = {5, 9, 13, 17, 21, 25, 29, 34, 38, 42, 46, 50, 54, 58, 62, 67, 71, 75,
-            79, 83, 87, 91, 95, 100, 104, 108, 112, 116, 120, 124};
+
+    private static final Set<Integer> KHAYYAM_TABLE = new HashSet<>(Arrays.asList(
+            5, 9, 13, 17, 21, 25, 29, 34, 38, 42, 46, 50, 54, 58, 62, 67, 71, 75,
+            79, 83, 87, 91, 95, 100, 104, 108, 112, 116, 120, 124));
+
+    private static final Set<Integer> EXCEPTION_LEAP_YEARS = new HashSet<>(Arrays.asList(
+            1403, 1436, 1469));
+    private static final Set<Integer> EXCEPTION_COMMON_YEARS = new HashSet<>(Arrays.asList(
+            1404, 1437, 1470));
 
     public static boolean isLeapYear(int year) {
+        if (EXCEPTION_LEAP_YEARS.contains(year)) {
+            return true;
+        }
+        if (EXCEPTION_COMMON_YEARS.contains(year)) {
+            return false;
+        }
+
         int dd;
         if (year >= 474) {
             dd = (year - 474) % 128;
@@ -23,12 +36,7 @@ public class JalaliUtil {
             dd = (year >= 342) ? (year - 342) : (128 - (374 - year) % 128);
         }
 
-        for (int i = 0; i < 30; i++) {
-            if (KHAYYAM_TABLE[i] == dd)
-                return true;
-        }
-
-        return false;
+        return KHAYYAM_TABLE.contains(dd);
     }
 
     public static Date jalaliToGregorian(JalaliDate jalaliDate) {

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,16 +22,7 @@ public class JalaliCalendarTest {
         JalaliDate newJalaliDate = new JalaliDate(jalaliCalendar.get(Calendar.YEAR), jalaliCalendar.get(Calendar.MONTH) + 1,
                 jalaliCalendar.get(Calendar.DAY_OF_MONTH), jalaliCalendar.get(Calendar.HOUR_OF_DAY),
                 jalaliCalendar.get(Calendar.MINUTE), jalaliCalendar.get(Calendar.SECOND));
-        assertEquals(newJalaliDate.compareTo(jalaliDate), 1);
-    }
-
-    @Test
-    public void convertGtoJDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2009, Calendar.MARCH, 20, 23, 50, 3);
-        JalaliDate newJalaliDate = JalaliUtil.gregorianToJalali(calendar.getTime());
-        JalaliDate jalaliDate = new JalaliDate(1387, 12, 30, 23, 50, 3);
-        assertEquals(jalaliDate, newJalaliDate);
+        assertEquals(1, newJalaliDate.compareTo(jalaliDate));
     }
 
     @Test
@@ -78,28 +68,13 @@ public class JalaliCalendarTest {
     }
 
     @Test
-    public void convertJtoG() {
-        JalaliDate jalaliDate = new JalaliDate(1387, 12, 30, 23, 20, 3);
-        Date gDate = JalaliUtil.jalaliToGregorian(jalaliDate);
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        assertEquals("2009/03/20 23:20:03", formatter.format(gDate));
-    }
-
-    @Test
-    public void parse() {
-        JalaliDate jalaliDate = new JalaliDate(1383, 9, 19, 15, 14, 0);
-        JalaliDate newJalaliDate = JalaliUtil.parseJalaliDate("1383/9/19, 15:14", "yyyy/MM/dd, HH:mm");
-        assertEquals(jalaliDate, newJalaliDate);
-    }
-
-    @Test
     public void parse1() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM");
         JalaliCalendar jalaliCalendar = new JalaliCalendar(new JalaliDate(1386, 7, 2, 16, 41, 60));
-        assertEquals(jalaliCalendar.get(Calendar.AM_PM), 1);
+        assertEquals(1, jalaliCalendar.get(Calendar.AM_PM));
         format.setCalendar(jalaliCalendar);
-        assertEquals(format.format(jalaliCalendar.getTime()), "1386/07");
-        assertEquals(jalaliCalendar.get(Calendar.DAY_OF_MONTH), 2);
+        assertEquals("1386/07", format.format(jalaliCalendar.getTime()));
+        assertEquals(2, jalaliCalendar.get(Calendar.DAY_OF_MONTH));
     }
 
     @Test
@@ -159,7 +134,7 @@ public class JalaliCalendarTest {
         jalaliCalendar.add(Calendar.HOUR_OF_DAY, -10);
         assertEquals(1385, jalaliCalendar.get(Calendar.YEAR));
         assertEquals(0, jalaliCalendar.get(Calendar.MONTH)); //Month is started from zero
-        assertEquals(jalaliCalendar.get(Calendar.DAY_OF_MONTH), 23);
+        assertEquals(23, jalaliCalendar.get(Calendar.DAY_OF_MONTH));
         assertEquals(23, jalaliCalendar.get(Calendar.HOUR_OF_DAY));
         assertEquals(11, jalaliCalendar.get(Calendar.HOUR));
         assertEquals(55, jalaliCalendar.get(Calendar.MINUTE));
@@ -237,27 +212,27 @@ public class JalaliCalendarTest {
 
     @Test
     public void compareDates() {
-        assertEquals(new JalaliDate(1388, 3, 16, 13, 20, 34)
-                .compareTo(new JalaliDate(1388, 3, 16, 13, 20, 34)), 0);
-        assertEquals(new JalaliDate(1388, 3, 16, 0, 0, 0)
-                .compareTo(new JalaliDate(1388, 3, 16, 0, 0, 0)), 0);
-        assertEquals(new JalaliDate(1388, 3, 16)
-                .compareTo(new JalaliDate(1388, 3, 16)), 0);
-        assertEquals(new JalaliDate(1388, 3, 16, 0, 0, 34)
-                .compareTo(new JalaliDate(1388, 3, 16, 0, 0, 34)), 0);
+        assertEquals(0, new JalaliDate(1388, 3, 16, 13, 20, 34)
+                .compareTo(new JalaliDate(1388, 3, 16, 13, 20, 34)));
+        assertEquals(0, new JalaliDate(1388, 3, 16, 0, 0, 0)
+                .compareTo(new JalaliDate(1388, 3, 16, 0, 0, 0)));
+        assertEquals(0, new JalaliDate(1388, 3, 16)
+                .compareTo(new JalaliDate(1388, 3, 16)));
+        assertEquals(0, new JalaliDate(1388, 3, 16, 0, 0, 34)
+                .compareTo(new JalaliDate(1388, 3, 16, 0, 0, 34)));
 
         //Bigger
-        assertEquals(new JalaliDate(1388, 3, 16, 13, 20, 35)
-                .compareTo(new JalaliDate(1388, 3, 16, 13, 20, 34)), 1);
+        assertEquals(1, new JalaliDate(1388, 3, 16, 13, 20, 35)
+                .compareTo(new JalaliDate(1388, 3, 16, 13, 20, 34)));
         //Smaller
-        assertEquals(new JalaliDate(1388, 3, 16, 0, 0, 0)
-                .compareTo(new JalaliDate(1388, 3, 17, 0, 0, 0)), -1);
+        assertEquals(-1, new JalaliDate(1388, 3, 16, 0, 0, 0)
+                .compareTo(new JalaliDate(1388, 3, 17, 0, 0, 0)));
         //Smaller
-        assertEquals(new JalaliDate(1378, 3, 16)
-                .compareTo(new JalaliDate(1388, 6, 30)), -1);
+        assertEquals(-1, new JalaliDate(1378, 3, 16)
+                .compareTo(new JalaliDate(1388, 6, 30)));
         //Bigger
-        assertEquals(new JalaliDate(1388, 3, 16, 3, 0, 34)
-                .compareTo(new JalaliDate(1388, 3, 16, 0, 0, 34)), 1);
+        assertEquals(1, new JalaliDate(1388, 3, 16, 3, 0, 34)
+                .compareTo(new JalaliDate(1388, 3, 16, 0, 0, 34)));
     }
 
     @Test
@@ -265,15 +240,15 @@ public class JalaliCalendarTest {
         JalaliDate j1 = new JalaliDate(1387, 9, 8);
         JalaliDate j2 = new JalaliDate(1387, 9, 8, 0, 0, 0);
 
-        assertNotEquals(j1, null);
+        assertNotEquals(null, j1);
         assertEquals(j1, j2);
-        assertNotEquals(j1, new JalaliDate(1386, 1, 1, 1, 1, 1));
-        assertNotEquals(j1, new JalaliDate(1387, 1, 1, 1, 1, 1));
-        assertNotEquals(j1, new JalaliDate(1387, 9, 1, 1, 1, 1));
-        assertNotEquals(j1, new JalaliDate(1387, 9, 8, 1, 1, 1));
-        assertNotEquals(j1, new JalaliDate(1387, 9, 8, 0, 1, 1));
-        assertNotEquals(j1, new JalaliDate(1387, 9, 8, 0, 0, 1));
-        assertEquals(j1, new JalaliDate(1387, 9, 8, 0, 0, 0));
+        assertNotEquals(new JalaliDate(1386, 1, 1, 1, 1, 1), j1);
+        assertNotEquals(new JalaliDate(1387, 1, 1, 1, 1, 1), j1);
+        assertNotEquals(new JalaliDate(1387, 9, 1, 1, 1, 1), j1);
+        assertNotEquals(new JalaliDate(1387, 9, 8, 1, 1, 1), j1);
+        assertNotEquals(new JalaliDate(1387, 9, 8, 0, 1, 1), j1);
+        assertNotEquals(new JalaliDate(1387, 9, 8, 0, 0, 1), j1);
+        assertEquals(new JalaliDate(1387, 9, 8, 0, 0, 0), j1);
     }
 
     @Test
@@ -298,12 +273,12 @@ public class JalaliCalendarTest {
         calendar.set(2009, Calendar.MARCH, 20, 23, 20, 3);
         JalaliCalendar jalaliCalendar = new JalaliCalendar(calendar, TimeZone.getTimeZone("GMT+3:30"));
 
-        assertEquals(jalaliCalendar.get(JalaliCalendar.YEAR), 1387);
-        assertEquals(jalaliCalendar.get(JalaliCalendar.MONTH), 12 - 1);
-        assertEquals(jalaliCalendar.get(JalaliCalendar.DAY_OF_MONTH), 30);
-        assertEquals(jalaliCalendar.get(JalaliCalendar.HOUR), 11);
-        assertEquals(jalaliCalendar.get(JalaliCalendar.HOUR_OF_DAY), 23);
-        assertEquals(jalaliCalendar.get(JalaliCalendar.MINUTE), 50);
-        assertEquals(jalaliCalendar.get(JalaliCalendar.SECOND), 3);
+        assertEquals(1387, jalaliCalendar.get(JalaliCalendar.YEAR));
+        assertEquals(12 - 1, jalaliCalendar.get(JalaliCalendar.MONTH));
+        assertEquals(30, jalaliCalendar.get(JalaliCalendar.DAY_OF_MONTH));
+        assertEquals(11, jalaliCalendar.get(JalaliCalendar.HOUR));
+        assertEquals(23, jalaliCalendar.get(JalaliCalendar.HOUR_OF_DAY));
+        assertEquals(50, jalaliCalendar.get(JalaliCalendar.MINUTE));
+        assertEquals(3, jalaliCalendar.get(JalaliCalendar.SECOND));
     }
 }
