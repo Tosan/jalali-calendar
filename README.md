@@ -5,7 +5,8 @@ You can convert jalali to gregorian calendar and vice-versa with the JalaliUtil 
 
 ## Usage
 
-For start, you should add the following dependency to your pom:
+For start, you should add the following dependency to your pom. 
+also you can find the latest-version in the Maven Central repository.
 
 ```
 <dependency>
