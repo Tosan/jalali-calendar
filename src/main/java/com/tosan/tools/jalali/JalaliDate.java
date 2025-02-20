@@ -136,7 +136,8 @@ public class JalaliDate implements Serializable, Comparable<JalaliDate> {
     @Override
     public String toString() {
         Formatter formatter = new Formatter();
-        return formatter.format("%1$04d/%2$02d/%3$02d %4$02d:%5$02d:%6$02d", year, month, day, hour, minute, second).toString();
+        return formatter.format("%1$04d/%2$02d/%3$02d %4$02d:%5$02d:%6$02d",
+                year, month, day, hour, minute, second).toString();
     }
 
     public boolean isValid() {
@@ -166,7 +167,7 @@ public class JalaliDate implements Serializable, Comparable<JalaliDate> {
             return false;
         }
         return (o.month <= 6) || (o.month < 12 && o.day <= 30) || (o.month == 12 && (o.day < 30 ||
-                (o.day == 30 && JalaliUtil.isLeapYear(year))));
+                (o.day == 30 && JalaliUtil.isLeapYear(o.year))));
     }
 
     public int getYear() {
