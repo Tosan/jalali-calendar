@@ -20,6 +20,12 @@ also you can find the latest-version in the Maven Central repository.
 
 This Library requires java version 8 or above.
 
+### Leap Year Algorithm
+The library uses the Khayyam table algorithm with hardcoded exceptions.
+The algorithm calculates a 128-year cycle offset and checks against a predefined set of leap year positions.
+
+Exception years (1403, 1436, 1469, 1404, 1437, 1470) are handled via HashSet lookups.
+
 ## Contributing
 
 Any contribution is greatly appreciated.
